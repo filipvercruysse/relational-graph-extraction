@@ -125,10 +125,11 @@ cd code/
 
 This is a work in progress. Next experiments:
 
-- [ ] Hybrid pipeline: GLiNER2 entities → constrained LLM for relations
-- [ ] Test on real notes instead of synthetic text
-- [ ] Cost comparison: full LLM vs hybrid per 1000 documents
-- [ ] Vector-similarity linking as an alternative to LLM relation extraction
+- [ ] **Hybrid pipeline:** GLiNER2 entities → constrained LLM for relations. The encoder finds the nodes cheaply; the LLM only has to wire edges between a known set of entities, which should be much cheaper than full extraction.
+- [ ] **From relational graph to AST.** A relational graph is flat: nodes and edges, no hierarchy. An AST (abstract syntax tree) adds *structure* — it says not just that A relates to B, but that A is a *step inside* B, or that B *depends on* the result of A. Think of a math proof: the conclusion sits at the root, each lemma is a branch, and the premises are leaves. Could GLiNER2 extract the nodes of a reasoning trace (claims, premises, conclusions, operators) while a second pass — vector similarity or a cheap classifier — recovers the parent-child nesting? The flat relational graph from this experiment would be the starting point; the AST would be the next rung.
+- [ ] **Test on real notes** instead of synthetic text.
+- [ ] **Cost comparison:** full LLM vs hybrid per 1000 documents.
+- [ ] **Vector-similarity linking** as an alternative to LLM relation extraction — embed each extracted entity span, then propose edges by cosine similarity + sentence-order constraints.
 
 ---
 
