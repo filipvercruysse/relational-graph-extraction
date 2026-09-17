@@ -7,16 +7,16 @@ Runs local entity and relation extraction on the blog draft in `../notes/problem
 The virtual environment and downloaded model weights live outside the vault:
 
 ```bash
-python3.13 -m venv ~/.virtualenvs/vector-search-ast
-~/.virtualenvs/vector-search-ast/bin/pip install -r code/requirements.txt
+python3.13 -m venv ~/.virtualenvs/relgraph
+~/.virtualenvs/relgraph/bin/pip install -r code/requirements.txt
 ```
 
 ## Run
 
-From `Filip/Projects/Vector_Search_AST/`:
+From `Filip/Projects/Relational_Graph_Extraction/`:
 
 ```bash
-~/.virtualenvs/vector-search-ast/bin/python \
+~/.virtualenvs/relgraph/bin/python \
   code/run_gliner2.py notes/problem_outline.md \
   --output code/output/problem_outline_gliner2.json
 ```

@@ -1,6 +1,6 @@
 ---
 type: blog-draft
-project: Vector_Search_AST
+project: Relational_Graph_Extraction
 status: draft
 updated: 2026-09-16
 ---

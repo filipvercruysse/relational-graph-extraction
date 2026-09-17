@@ -109,12 +109,12 @@ This hybrid could preserve most of the cost savings while keeping relation quali
 
 ```bash
 # Set up
-python3 -m venv ~/.virtualenvs/vector-search-ast
-~/.virtualenvs/vector-search-ast/bin/pip install -r code/requirements.txt
+python3 -m venv ~/.virtualenvs/relgraph
+~/.virtualenvs/relgraph/bin/pip install -r code/requirements.txt
 
 # Run the benchmark
 cd code/
-~/.virtualenvs/vector-search-ast/bin/python benchmark_ground_truth.py \
+~/.virtualenvs/relgraph/bin/python benchmark_ground_truth.py \
   --llm-file ../data/llm_extraction.json \
   --output-dir output/benchmark
 ```
