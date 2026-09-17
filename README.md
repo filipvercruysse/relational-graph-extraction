@@ -43,6 +43,16 @@ We wrote a short paragraph with an unambiguous causal structure — a **deforest
 
 > Deforestation removes large areas of trees from tropical rainforests. Without tree cover, soil is directly exposed to heavy rainfall, which causes erosion. Erosion washes nutrient-rich topsoil into rivers, degrading water quality and causing sedimentation. Sedimentation blocks river channels, increasing the risk of flooding downstream. Meanwhile, the loss of trees reduces carbon absorption, accelerating the rise of atmospheric CO2. Higher CO2 levels intensify the greenhouse effect, raising global temperatures. Rising temperatures alter precipitation patterns, leading to more frequent droughts. Droughts weaken the remaining forest, making it more vulnerable to wildfires. Wildfires destroy yet more trees, feeding back into deforestation.
 
+### How we score
+
+We compare each extractor's output against the hand-labeled ground truth using three metrics:
+
+- **Precision** — *of everything the model claimed, how much was correct?* A model that extracts 10 entities and 9 are real has precision = 0.90. High precision means few false alarms.
+- **Recall** — *of everything that should have been found, how much did the model actually find?* If there are 16 ground-truth entities and the model found 14 of them, recall = 14/16 = 0.88. High recall means few things were missed.
+- **F1** — *the harmonic mean of precision and recall.* It penalises models that are good at one but bad at the other. An F1 of 1.0 means the model found exactly the right things, no more, no less.
+
+We compute these separately for **entities** (did you find the right nodes?) and **relations** (did you draw the right arrows between them?).
+
 ### Results
 
 | Metric | GLiNER2 (205M) | LLM (Claude) |
@@ -56,21 +66,13 @@ We wrote a short paragraph with an unambiguous causal structure — a **deforest
 
 ### Visual comparison
 
-**Ground truth** — the complete 16-node causal cycle:
+All three graphs below use the same node layout — positions are anchored to the ground truth so you can compare at a glance which edges are present or missing.
 
-![Ground Truth](figures/graph_ground_truth.png)
+![Ground Truth vs GLiNER2 vs LLM](figures/comparison.png)
 
-**GLiNER2** — finds most entities but only 3 of 15 relations, with several self-loops:
-
-![GLiNER2 extraction](figures/graph_gliner2.png)
-
-**LLM (Claude)** — nearly perfect recovery of the full causal chain:
-
-![LLM extraction](figures/graph_llm.png)
-
-**Side-by-side comparison:**
-
-![Comparison](figures/comparison.png)
+**Top — Ground truth** (16 entities, 15 relations): the complete causal cycle we labeled by hand.
+**Middle — GLiNER2** (17 entities, 8 relations): finds most nodes in the right places, but the wiring is sparse — only 3 of 15 edges are correct, and several are self-loops.
+**Bottom — LLM** (21 entities, 18 relations): nearly perfect recovery of the full causal chain, with a few extra nodes on the periphery.
 
 ## Analysis
 
@@ -113,7 +115,7 @@ python3 -m venv ~/.virtualenvs/vector-search-ast
 # Run the benchmark
 cd code/
 ~/.virtualenvs/vector-search-ast/bin/python benchmark_ground_truth.py \
-  --llm-file output/benchmark/llm_extraction.json \
+  --llm-file ../data/llm_extraction.json \
   --output-dir output/benchmark
 ```
 
