@@ -1,43 +1,43 @@
-# Can we build causal knowledge graphs from text — cheaply?
+# Can a small encoder build relational graphs from text?
 
-> **TL;DR:** We test whether a small encoder model (GLiNER2, 205M params) can replace a large language model for extracting causal graphs from text. Entity extraction works well (F1 = 0.90). Relation extraction does not (F1 = 0.26 vs 0.85 for the LLM). The path forward is a hybrid: encoder for entities, LLM for relations.
+> **TL;DR:** We test whether a small encoder model (GLiNER2, 205M params) can extract a relational graph from text — the first rung of Judea Pearl's causal ladder. Entity extraction works well (F1 = 0.90). Relation extraction does not (F1 = 0.26 vs 0.85 for an LLM). The path forward is a hybrid: encoder for entities, LLM for relations.
 
 ---
 
 ## The question
 
-Can we take a piece of text and automatically turn it into a **causal knowledge graph**, without relying on a large language model for every step?
+Given a piece of text, can we automatically extract a **relational graph** — a set of entities and the relationships stated between them?
 
-A knowledge graph represents information as nodes (concepts) and edges (relationships). A **causal** graph makes a stronger claim: the arrows mean one thing *influences* another.
+This is the first rung of Judea Pearl's [ladder of causation](https://en.wikipedia.org/wiki/Causal_model#The_ladder_of_causation): **association**. Before we can ask *why* things happen (intervention, rung 2) or *what would have happened* (counterfactuals, rung 3), we need to know *what goes with what*. A relational graph captures that: it records which entities a text mentions and what the text claims about how they are connected.
 
 ```
-hot weather → increases → ice cream sales
-hot weather → increases → sunburn
+deforestation → removes → trees
+erosion → degrades → water quality
 ```
 
-The direction of the arrows matters. They turn a collection of facts into a model of how events influence one another. Such a graph could help us search notes in a more meaningful way — not just "which notes mention sleep?" but "what do my notes claim *improves* sleep?"
+This is not a causal graph. A relational graph does not claim that one thing *causes* another — only that the text says they are related, and in what way. Causality would require interventions, controls, or at least a direction that survives confounding. We are not there. We are asking the simpler question: **can we recover the relational structure a text expresses?**
 
-## Why this matters
+## Why bother?
 
-LLMs are a natural way to build such graphs. Give one a schema, ask it to return JSON, and it works. But it's slow and expensive. Every sentence goes through a billion-parameter decoder. That may be fine for one article. It becomes a problem when processing thousands of notes, or rebuilding the graph every time a note changes.
+LLMs can do this. Give one a schema, ask it to return entities and relations as JSON, and it works. But every sentence runs through a billion-parameter decoder. That's fine for one article. It becomes expensive when processing thousands of notes, or rebuilding a graph every time a note changes.
 
-**Can a smaller, specialized model do most of the extraction more efficiently?**
+**Can a smaller, specialized model do most of the extraction more cheaply?**
 
 ## The approach: highlighter vs novelist
 
-A general language model is a *writer*: it reads a page and produces another page. An encoder like [GLiNER2](https://github.com/urchade/GLiNER) is a *highlighter*: it reads a page and marks the important parts already present.
+A language model is a *writer*: it reads a page and produces another page. An encoder like [GLiNER2](https://github.com/urchade/GLiNER) is a *highlighter*: it reads a page and marks the spans that match a schema you give it.
 
 ```
-[CAUSE: sleep deprivation] → [RELATION: slows] → [EFFECT: reaction time]
+[ENTITY: sleep deprivation] → [RELATION: slows] → [ENTITY: reaction time]
 ```
 
-GLiNER2 (205M parameters) is told which kinds of things to look for — you give it a schema of entity types and relation types, and it returns spans from the original text with confidence scores. No generation, no token cost. One forward pass.
+GLiNER2 (205M parameters) takes a schema of entity types and relation types, and returns spans from the original text with confidence scores. No generation, no token cost. One forward pass.
 
 The bet: entity extraction (finding the nodes) might work well with a small encoder. Relation extraction (wiring the edges) is harder and might still need an LLM.
 
 ## Experiment: ground-truth benchmark
 
-We wrote a short paragraph with an unambiguous causal structure — a **deforestation feedback loop** with 16 entities and 15 causal relations forming a directed cycle. Both GLiNER2 and an LLM (Claude) extracted entities and relations from the same text, scored against hand-labeled ground truth.
+We wrote a short paragraph about a **deforestation feedback loop** with 16 entities and 15 relations forming a directed cycle. Both GLiNER2 and an LLM (Claude) extracted entities and relations from the same text, scored against hand-labeled ground truth.
 
 ### Test text
 
@@ -51,7 +51,7 @@ We compare each extractor's output against the hand-labeled ground truth using t
 - **Recall** — *of everything that should have been found, how much did the model actually find?* If there are 16 ground-truth entities and the model found 14 of them, recall = 14/16 = 0.88. High recall means few things were missed.
 - **F1** — *the harmonic mean of precision and recall.* It penalises models that are good at one but bad at the other. An F1 of 1.0 means the model found exactly the right things, no more, no less.
 
-We compute these separately for **entities** (did you find the right nodes?) and **relations** (did you draw the right arrows between them?).
+We compute these separately for **entities** (did you find the right nodes?) and **relations** (did you draw the right edges between them?).
 
 ### Results
 
@@ -66,13 +66,13 @@ We compute these separately for **entities** (did you find the right nodes?) and
 
 ### Visual comparison
 
-All three graphs below use the same node layout — positions are anchored to the ground truth so you can compare at a glance which edges are present or missing.
+All three graphs use the same node layout — positions are anchored to the ground truth so you can compare at a glance which edges are present or missing.
 
 ![Ground Truth vs GLiNER2 vs LLM](figures/comparison.png)
 
-**Top — Ground truth** (16 entities, 15 relations): the complete causal cycle we labeled by hand.
+**Top — Ground truth** (16 entities, 15 relations): the complete relational cycle we labeled by hand.
 **Middle — GLiNER2** (17 entities, 8 relations): finds most nodes in the right places, but the wiring is sparse — only 3 of 15 edges are correct, and several are self-loops.
-**Bottom — LLM** (21 entities, 18 relations): nearly perfect recovery of the full causal chain, with a few extra nodes on the periphery.
+**Bottom — LLM** (21 entities, 18 relations): nearly complete recovery of the relational structure, with a few extra nodes on the periphery.
 
 ## Analysis
 
@@ -84,26 +84,26 @@ For entity recognition alone, a 205M encoder running in 0.4 seconds on CPU is co
 
 ### Relation extraction: the hard problem
 
-This is where the gap opens dramatically. GLiNER2 found only 3 of 15 relations correctly (recall = 0.20), and 5 of its 8 extractions were self-loops ("erosion causes erosion", "soil exposes soil").
+This is where the gap opens. GLiNER2 found only 3 of 15 relations correctly (recall = 0.20), and 5 of its 8 extractions were self-loops ("erosion causes erosion", "soil exposes soil").
 
-Looking at the source code, GLiNER2's relation extraction independently finds the "best head span" and "best tail span" for each relation type. It doesn't reason about which entity causes which — it pattern-matches two spans separately and pairs them. That's why it produces self-loops and misses long-range causal chains.
+Looking at the source code, GLiNER2's relation extraction independently finds the "best head span" and "best tail span" for each relation type. It doesn't reason about which entity relates to which — it pattern-matches two spans separately and pairs them. That's why it produces self-loops and misses connections across sentences.
 
-The LLM recovered 14 of 15 relations (recall = 0.93). It only missed one subtle chain where the causal link goes through an intermediate step not mentioned explicitly.
+The LLM recovered 14 of 15 relations (recall = 0.93). It only missed one where the link runs through an intermediate step not stated explicitly.
 
 ### Why the gap?
 
-1. **Relation extraction requires argument structure.** An encoder excels at finding *where* things are, but linking *which* thing causes *which* requires parsing who-does-what-to-whom — fundamentally a reasoning task.
+1. **Relation extraction requires argument structure.** An encoder excels at finding *where* things are. Linking *which* thing relates to *which* requires parsing who-does-what-to-whom — a reasoning task.
 2. **Self-loop artifacts.** The model anchors on the strongest span and maps it to both head and tail.
-3. **Long-range dependencies.** The feedback loop (wildfires → deforestation) spans the entire paragraph. Entity detection handles this; relation pairing does not.
+3. **Cross-sentence dependencies.** Some relations span multiple sentences. Entity detection handles this; relation pairing degrades over distance.
 
 ## The path forward: a hybrid architecture
 
 The results suggest a practical split:
 
 - **Entity extraction → small encoder** (GLiNER2). Fast, cheap, high precision.
-- **Relation extraction → focused LLM pass** over pre-extracted entities. Cheaper than full LLM extraction because the entity set is already given — the LLM only needs to wire connections, not discover nodes.
+- **Relation extraction → focused LLM pass** over pre-extracted entities. Cheaper than full LLM extraction because the entity set is already given — the LLM only needs to wire edges, not discover nodes.
 
-This hybrid could preserve most of the cost savings (entities are the bulk of the extraction work) while keeping relation quality high.
+This hybrid could preserve most of the cost savings while keeping relation quality high. And once we have reliable relational graphs (Pearl's rung 1), we can start asking whether any of those edges are causal — but that's a different experiment.
 
 ## Reproduce
 
@@ -124,8 +124,8 @@ cd code/
 This is a work in progress. Next experiments:
 
 - [ ] Hybrid pipeline: GLiNER2 entities → constrained LLM for relations
-- [ ] Test on real Obsidian notes instead of synthetic text
-- [ ] Cost comparison: full LLM vs hybrid per 1000 notes
+- [ ] Test on real notes instead of synthetic text
+- [ ] Cost comparison: full LLM vs hybrid per 1000 documents
 - [ ] Vector-similarity linking as an alternative to LLM relation extraction
 
 ---
