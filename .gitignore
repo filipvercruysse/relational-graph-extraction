@@ -1,0 +1,16 @@
+# Obsidian vault hub (contains [[wikilinks]] that only work inside the vault)
+Vector_Search_AST.md
+
+# Python / ML artifacts
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Generated outputs (reproducible from code)
+code/output/
+
+# Model weights (downloaded at runtime)
+*.bin
+*.safetensors
+*.onnx

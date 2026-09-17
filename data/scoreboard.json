@@ -1,0 +1,576 @@
+{
+  "test_text": "Deforestation removes large areas of trees from tropical rainforests. Without tree cover, soil is directly exposed to heavy rainfall, which causes erosion. Erosion washes nutrient-rich topsoil into rivers, degrading water quality and causing sedimentation. Sedimentation blocks river channels, increasing the risk of flooding downstream. Meanwhile, the loss of trees reduces carbon absorption, accelerating the rise of atmospheric CO2. Higher CO2 levels intensify the greenhouse effect, raising global temperatures. Rising temperatures alter precipitation patterns, leading to more frequent droughts. Droughts weaken the remaining forest, making it more vulnerable to wildfires. Wildfires destroy yet more trees, feeding back into deforestation.",
+  "ground_truth": {
+    "entities": [
+      {
+        "text": "deforestation",
+        "label": "process"
+      },
+      {
+        "text": "trees",
+        "label": "entity"
+      },
+      {
+        "text": "soil",
+        "label": "entity"
+      },
+      {
+        "text": "erosion",
+        "label": "process"
+      },
+      {
+        "text": "topsoil",
+        "label": "entity"
+      },
+      {
+        "text": "rivers",
+        "label": "entity"
+      },
+      {
+        "text": "water quality",
+        "label": "property"
+      },
+      {
+        "text": "sedimentation",
+        "label": "process"
+      },
+      {
+        "text": "flooding",
+        "label": "process"
+      },
+      {
+        "text": "carbon absorption",
+        "label": "process"
+      },
+      {
+        "text": "atmospheric CO2",
+        "label": "entity"
+      },
+      {
+        "text": "greenhouse effect",
+        "label": "process"
+      },
+      {
+        "text": "global temperatures",
+        "label": "property"
+      },
+      {
+        "text": "precipitation patterns",
+        "label": "property"
+      },
+      {
+        "text": "droughts",
+        "label": "process"
+      },
+      {
+        "text": "wildfires",
+        "label": "process"
+      }
+    ],
+    "relations": [
+      {
+        "head": "deforestation",
+        "relation": "removes",
+        "tail": "trees"
+      },
+      {
+        "head": "deforestation",
+        "relation": "exposes",
+        "tail": "soil"
+      },
+      {
+        "head": "soil",
+        "relation": "causes",
+        "tail": "erosion"
+      },
+      {
+        "head": "erosion",
+        "relation": "washes_away",
+        "tail": "topsoil"
+      },
+      {
+        "head": "erosion",
+        "relation": "degrades",
+        "tail": "water quality"
+      },
+      {
+        "head": "erosion",
+        "relation": "causes",
+        "tail": "sedimentation"
+      },
+      {
+        "head": "sedimentation",
+        "relation": "increases",
+        "tail": "flooding"
+      },
+      {
+        "head": "deforestation",
+        "relation": "reduces",
+        "tail": "carbon absorption"
+      },
+      {
+        "head": "carbon absorption",
+        "relation": "increases",
+        "tail": "atmospheric CO2"
+      },
+      {
+        "head": "atmospheric CO2",
+        "relation": "intensifies",
+        "tail": "greenhouse effect"
+      },
+      {
+        "head": "greenhouse effect",
+        "relation": "raises",
+        "tail": "global temperatures"
+      },
+      {
+        "head": "global temperatures",
+        "relation": "alters",
+        "tail": "precipitation patterns"
+      },
+      {
+        "head": "precipitation patterns",
+        "relation": "causes",
+        "tail": "droughts"
+      },
+      {
+        "head": "droughts",
+        "relation": "causes",
+        "tail": "wildfires"
+      },
+      {
+        "head": "wildfires",
+        "relation": "causes",
+        "tail": "deforestation"
+      }
+    ],
+    "num_entities": 16,
+    "num_relations": 15
+  },
+  "gliner2": {
+    "entities": [
+      {
+        "text": "sedimentation",
+        "label": "process"
+      },
+      {
+        "text": "Erosion",
+        "label": "process"
+      },
+      {
+        "text": "deforestation",
+        "label": "process"
+      },
+      {
+        "text": "Wildfires",
+        "label": "process"
+      },
+      {
+        "text": "droughts",
+        "label": "process"
+      },
+      {
+        "text": "greenhouse effect",
+        "label": "process"
+      },
+      {
+        "text": "precipitation patterns",
+        "label": "process"
+      },
+      {
+        "text": "trees",
+        "label": "entity"
+      },
+      {
+        "text": "soil",
+        "label": "entity"
+      },
+      {
+        "text": "topsoil",
+        "label": "entity"
+      },
+      {
+        "text": "rivers",
+        "label": "entity"
+      },
+      {
+        "text": "forest",
+        "label": "entity"
+      },
+      {
+        "text": "river channels",
+        "label": "entity"
+      },
+      {
+        "text": "atmospheric CO2",
+        "label": "entity"
+      },
+      {
+        "text": "water quality",
+        "label": "property"
+      },
+      {
+        "text": "carbon absorption",
+        "label": "property"
+      },
+      {
+        "text": "precipitation patterns",
+        "label": "property"
+      }
+    ],
+    "relations": [
+      {
+        "head": "erosion",
+        "relation": "causes",
+        "tail": "erosion"
+      },
+      {
+        "head": "erosion",
+        "relation": "causes",
+        "tail": "sedimentation"
+      },
+      {
+        "head": "sedimentation",
+        "relation": "causes",
+        "tail": "Sedimentation"
+      },
+      {
+        "head": "Deforestation",
+        "relation": "removes",
+        "tail": "trees"
+      },
+      {
+        "head": "soil",
+        "relation": "exposes",
+        "tail": "soil"
+      },
+      {
+        "head": "erosion",
+        "relation": "washes_away",
+        "tail": "nutrient-rich topsoil"
+      },
+      {
+        "head": "loss of trees",
+        "relation": "reduces",
+        "tail": "carbon absorption"
+      },
+      {
+        "head": "Higher CO2 levels",
+        "relation": "intensifies",
+        "tail": "greenhouse effect"
+      }
+    ],
+    "entity_score": {
+      "precision": 0.933,
+      "recall": 0.875,
+      "f1": 0.903,
+      "tp": 14,
+      "fp": 1,
+      "fn": 2,
+      "tp_items": [
+        "atmospheric co2",
+        "carbon absorption",
+        "deforestation",
+        "droughts",
+        "erosion",
+        "greenhouse effect",
+        "precipitation patterns",
+        "rivers",
+        "sedimentation",
+        "soil",
+        "topsoil",
+        "trees",
+        "water quality",
+        "wildfires"
+      ],
+      "fp_items": [
+        "river channels"
+      ],
+      "fn_items": [
+        "flooding",
+        "global temperatures"
+      ]
+    },
+    "relation_score": {
+      "precision": 0.375,
+      "recall": 0.2,
+      "f1": 0.261,
+      "tp": 3,
+      "fp": 5,
+      "fn": 12,
+      "tp_items": [
+        "deforestation → trees",
+        "erosion → sedimentation",
+        "erosion → topsoil"
+      ],
+      "fp_items": [
+        "erosion → erosion",
+        "higher co2 levels → greenhouse effect",
+        "loss of trees → carbon absorption",
+        "sedimentation → sedimentation",
+        "soil → soil"
+      ],
+      "fn_items": [
+        "atmospheric co2 → greenhouse effect",
+        "carbon absorption → atmospheric co2",
+        "deforestation → carbon absorption",
+        "deforestation → soil",
+        "droughts → wildfires",
+        "erosion → water quality",
+        "global temperatures → precipitation patterns",
+        "greenhouse effect → global temperatures",
+        "precipitation patterns → droughts",
+        "sedimentation → flooding",
+        "soil → erosion",
+        "wildfires → deforestation"
+      ]
+    }
+  },
+  "llm": {
+    "entities": [
+      {
+        "text": "deforestation",
+        "label": "process"
+      },
+      {
+        "text": "trees",
+        "label": "entity"
+      },
+      {
+        "text": "tropical rainforests",
+        "label": "entity"
+      },
+      {
+        "text": "tree cover",
+        "label": "entity"
+      },
+      {
+        "text": "soil",
+        "label": "entity"
+      },
+      {
+        "text": "heavy rainfall",
+        "label": "process"
+      },
+      {
+        "text": "erosion",
+        "label": "process"
+      },
+      {
+        "text": "topsoil",
+        "label": "entity"
+      },
+      {
+        "text": "rivers",
+        "label": "entity"
+      },
+      {
+        "text": "water quality",
+        "label": "property"
+      },
+      {
+        "text": "sedimentation",
+        "label": "process"
+      },
+      {
+        "text": "river channels",
+        "label": "entity"
+      },
+      {
+        "text": "flooding",
+        "label": "process"
+      },
+      {
+        "text": "carbon absorption",
+        "label": "process"
+      },
+      {
+        "text": "atmospheric CO2",
+        "label": "entity"
+      },
+      {
+        "text": "greenhouse effect",
+        "label": "process"
+      },
+      {
+        "text": "global temperatures",
+        "label": "property"
+      },
+      {
+        "text": "precipitation patterns",
+        "label": "property"
+      },
+      {
+        "text": "droughts",
+        "label": "process"
+      },
+      {
+        "text": "remaining forest",
+        "label": "entity"
+      },
+      {
+        "text": "wildfires",
+        "label": "process"
+      }
+    ],
+    "relations": [
+      {
+        "head": "deforestation",
+        "relation": "removes",
+        "tail": "trees"
+      },
+      {
+        "head": "deforestation",
+        "relation": "exposes",
+        "tail": "soil"
+      },
+      {
+        "head": "heavy rainfall",
+        "relation": "causes",
+        "tail": "erosion"
+      },
+      {
+        "head": "erosion",
+        "relation": "washes_away",
+        "tail": "topsoil"
+      },
+      {
+        "head": "erosion",
+        "relation": "degrades",
+        "tail": "water quality"
+      },
+      {
+        "head": "erosion",
+        "relation": "causes",
+        "tail": "sedimentation"
+      },
+      {
+        "head": "sedimentation",
+        "relation": "blocks",
+        "tail": "river channels"
+      },
+      {
+        "head": "sedimentation",
+        "relation": "increases",
+        "tail": "flooding"
+      },
+      {
+        "head": "deforestation",
+        "relation": "reduces",
+        "tail": "carbon absorption"
+      },
+      {
+        "head": "carbon absorption",
+        "relation": "increases",
+        "tail": "atmospheric CO2"
+      },
+      {
+        "head": "atmospheric CO2",
+        "relation": "intensifies",
+        "tail": "greenhouse effect"
+      },
+      {
+        "head": "greenhouse effect",
+        "relation": "raises",
+        "tail": "global temperatures"
+      },
+      {
+        "head": "global temperatures",
+        "relation": "alters",
+        "tail": "precipitation patterns"
+      },
+      {
+        "head": "precipitation patterns",
+        "relation": "causes",
+        "tail": "droughts"
+      },
+      {
+        "head": "droughts",
+        "relation": "weakens",
+        "tail": "remaining forest"
+      },
+      {
+        "head": "droughts",
+        "relation": "causes",
+        "tail": "wildfires"
+      },
+      {
+        "head": "wildfires",
+        "relation": "destroys",
+        "tail": "trees"
+      },
+      {
+        "head": "wildfires",
+        "relation": "causes",
+        "tail": "deforestation"
+      }
+    ],
+    "entity_score": {
+      "precision": 0.762,
+      "recall": 1.0,
+      "f1": 0.865,
+      "tp": 16,
+      "fp": 5,
+      "fn": 0,
+      "tp_items": [
+        "atmospheric co2",
+        "carbon absorption",
+        "deforestation",
+        "droughts",
+        "erosion",
+        "flooding",
+        "global temperatures",
+        "greenhouse effect",
+        "precipitation patterns",
+        "rivers",
+        "sedimentation",
+        "soil",
+        "topsoil",
+        "trees",
+        "water quality",
+        "wildfires"
+      ],
+      "fp_items": [
+        "heavy rainfall",
+        "remaining forest",
+        "river channels",
+        "tree cover",
+        "tropical rainforests"
+      ],
+      "fn_items": []
+    },
+    "relation_score": {
+      "precision": 0.778,
+      "recall": 0.933,
+      "f1": 0.848,
+      "tp": 14,
+      "fp": 4,
+      "fn": 1,
+      "tp_items": [
+        "atmospheric co2 → greenhouse effect",
+        "carbon absorption → atmospheric co2",
+        "deforestation → carbon absorption",
+        "deforestation → soil",
+        "deforestation → trees",
+        "droughts → wildfires",
+        "erosion → sedimentation",
+        "erosion → topsoil",
+        "erosion → water quality",
+        "global temperatures → precipitation patterns",
+        "greenhouse effect → global temperatures",
+        "precipitation patterns → droughts",
+        "sedimentation → flooding",
+        "wildfires → deforestation"
+      ],
+      "fp_items": [
+        "droughts → remaining forest",
+        "heavy rainfall → erosion",
+        "sedimentation → river channels",
+        "wildfires → trees"
+      ],
+      "fn_items": [
+        "soil → erosion"
+      ]
+    }
+  }
+}
