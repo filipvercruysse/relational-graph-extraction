@@ -282,55 +282,75 @@ LABEL_COLORS = {
 }
 
 
-def _draw_one_graph(G: nx.DiGraph, ax, title: str, pos=None):
+LABEL_COLORS = {
+    "process":  "#E07A5F",   # terracotta
+    "entity":   "#3D405B",   # charcoal blue
+    "property": "#81B29A",   # sage green
+    "concept":  "#F2CC8F",   # warm sand
+    "method":   "#F4A261",   # sandy orange
+    "model":    "#264653",   # deep teal
+}
+
+
+def _draw_one_graph(G: nx.DiGraph, ax, title: str, pos=None, show_legend=False):
     """Draw a single graph onto an axes. Returns the layout used."""
     import matplotlib.patches as mpatches
 
     if len(G.nodes) == 0:
         ax.text(0.5, 0.5, "(empty graph)", ha="center", va="center",
                 fontsize=20, transform=ax.transAxes)
-        ax.set_title(title, fontsize=22, fontweight="bold", pad=20)
+        ax.set_title(title, fontsize=24, fontweight="bold", pad=24)
         ax.axis("off")
         return {}
 
     if pos is None:
         pos = nx.spring_layout(G, k=2.8, iterations=100, seed=42)
 
-    # Only draw positions for nodes actually in this graph
     draw_pos = {n: pos[n] for n in G.nodes if n in pos}
-
-    node_colors = [LABEL_COLORS.get(G.nodes[n].get("label", "").lower(), "#95a5a6")
-                   for n in G.nodes if n in draw_pos]
     nodelist = [n for n in G.nodes if n in draw_pos]
+    node_colors = [LABEL_COLORS.get(G.nodes[n].get("label", "").lower(), "#bbb")
+                   for n in nodelist]
 
-    nx.draw_networkx_nodes(G, draw_pos, nodelist=nodelist, ax=ax, node_size=3200,
-                           node_color=node_colors, alpha=0.85,
-                           edgecolors="#2c3e50", linewidths=2.0)
-    nx.draw_networkx_labels(G, draw_pos, ax=ax, font_size=16, font_weight="bold")
+    nx.draw_networkx_nodes(G, draw_pos, nodelist=nodelist, ax=ax, node_size=3600,
+                           node_color=node_colors, alpha=0.92,
+                           edgecolors="white", linewidths=2.5)
 
+    # Node labels ABOVE the circles
+    label_pos = {n: (xy[0], xy[1] + 0.085) for n, xy in draw_pos.items()}
+    nx.draw_networkx_labels(G, label_pos, ax=ax, font_size=15, font_weight="bold",
+                            font_color="#1a1a1a")
+
+    # Edges
     edgelist = [(u, v) for u, v in G.edges if u in draw_pos and v in draw_pos]
     nx.draw_networkx_edges(G, draw_pos, edgelist=edgelist, ax=ax,
-                           arrows=True, arrowsize=22,
-                           edge_color="#7f8c8d", width=2.5,
-                           connectionstyle="arc3,rad=0.12",
-                           min_source_margin=22, min_target_margin=22)
+                           arrows=True, arrowsize=24,
+                           edge_color="#999999", width=2.0, alpha=0.6,
+                           connectionstyle="arc3,rad=0.10",
+                           min_source_margin=24, min_target_margin=24)
 
+    # Edge labels — large and bold
     edge_labels = {(u, v): d.get("label", "")
                    for u, v, d in G.edges(data=True)
                    if u in draw_pos and v in draw_pos}
     edge_labels = {k: v for k, v in edge_labels.items() if v}
     if edge_labels:
         nx.draw_networkx_edge_labels(G, draw_pos, edge_labels=edge_labels,
-                                     ax=ax, font_size=13, font_color="#34495e")
+                                     ax=ax, font_size=13, font_color="#2c3e50",
+                                     font_weight="bold",
+                                     bbox=dict(boxstyle="round,pad=0.12",
+                                               fc="white", ec="none", alpha=0.75))
 
-    used_labels = {G.nodes[n].get("label", "").lower() for n in G.nodes}
-    patches = [mpatches.Patch(color=LABEL_COLORS.get(l, "#95a5a6"), label=l)
-               for l in sorted(used_labels) if l]
-    if patches:
-        ax.legend(handles=patches, loc="upper left", fontsize=13,
-                  framealpha=0.9, edgecolor="#cccccc")
+    # Single legend only on the first panel
+    if show_legend:
+        all_labels = sorted({G.nodes[n].get("label", "").lower()
+                             for n in G.nodes} - {""})
+        patches = [mpatches.Patch(color=LABEL_COLORS.get(l, "#bbb"), label=l)
+                   for l in all_labels]
+        if patches:
+            ax.legend(handles=patches, loc="upper left", fontsize=14,
+                      frameon=False, handlelength=1.5, handleheight=1.5)
 
-    ax.set_title(title, fontsize=22, fontweight="bold", pad=20)
+    ax.set_title(title, fontsize=24, fontweight="bold", pad=24)
     ax.axis("off")
     return pos
 
@@ -398,10 +418,12 @@ def draw_comparison(graphs: list[tuple[nx.DiGraph, str, Score | None, Score | No
 
     The first graph is treated as the ground truth; its layout anchors
     all subsequent panels so that shared nodes stay in the same place.
+    One legend on the first panel only.
     """
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
 
     n = len(graphs)
     fig, axes = plt.subplots(n, 1, figsize=(26, 20 * n))
@@ -414,8 +436,16 @@ def draw_comparison(graphs: list[tuple[nx.DiGraph, str, Score | None, Score | No
     other_graphs = [g for g, *_ in graphs[1:]]
     shared_pos = _compute_anchored_positions(gt_graph, other_graphs)
 
-    for ax, (G, title, ent_s, rel_s) in zip(axes, graphs):
-        _draw_one_graph(G, ax, title, pos=shared_pos)
+    # Collect ALL label types across all graphs for a unified legend
+    all_labels = set()
+    for G, *_ in graphs:
+        for nd in G.nodes:
+            lbl = G.nodes[nd].get("label", "").lower()
+            if lbl:
+                all_labels.add(lbl)
+
+    for i, (ax, (G, title, ent_s, rel_s)) in enumerate(zip(axes, graphs)):
+        _draw_one_graph(G, ax, title, pos=shared_pos, show_legend=False)
 
         # Score annotation below the graph
         subtitle_parts = []
@@ -429,10 +459,17 @@ def draw_comparison(graphs: list[tuple[nx.DiGraph, str, Score | None, Score | No
             ax.text(0.5, -0.02, "\n".join(subtitle_parts),
                     ha="center", va="top", transform=ax.transAxes,
                     fontsize=16, fontfamily="monospace",
-                    bbox=dict(boxstyle="round,pad=0.5", fc="#f8f8f8", ec="#cccccc"))
+                    bbox=dict(boxstyle="round,pad=0.5", fc="#f8f8f8", ec="none"))
+
+    # Single unified legend on the first panel
+    patches = [mpatches.Patch(color=LABEL_COLORS.get(l, "#bbb"), label=l)
+               for l in sorted(all_labels)]
+    if patches:
+        axes[0].legend(handles=patches, loc="upper left", fontsize=15,
+                       frameon=False, handlelength=1.8, handleheight=1.8)
 
     if suptitle:
-        fig.suptitle(suptitle, fontsize=26, fontweight="bold", y=1.005)
+        fig.suptitle(suptitle, fontsize=28, fontweight="bold", y=1.005)
     fig.tight_layout(h_pad=5.0)
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -511,7 +548,6 @@ def main() -> None:
 
     # ----- Ground truth graph -----
     gt_graph = build_nx_graph(GT_ENTITIES, GT_RELATIONS, "Ground Truth")
-    draw_graph(gt_graph, outdir / "graph_ground_truth.png", "Ground Truth")
 
     # ----- GLiNER2 -----
     gliner_raw = run_gliner2(TEST_TEXT)
@@ -522,7 +558,6 @@ def main() -> None:
     print(f"\nGLiNER2 found {len(gliner_ents)} entities, {len(gliner_rels)} relations")
 
     gliner_graph = build_nx_graph(gliner_ents, gliner_rels, "GLiNER2 extraction")
-    draw_graph(gliner_graph, outdir / "graph_gliner2.png", "GLiNER2 Extraction")
 
     ent_score_g = score_entities(GT_ENTITIES, gliner_ents, "GLiNER2 entities")
     rel_score_g = score_relations(GT_RELATIONS, gliner_rels, "GLiNER2 relations")
@@ -537,7 +572,6 @@ def main() -> None:
         print(f"\nLLM found {len(llm_ents)} entities, {len(llm_rels)} relations")
 
         llm_graph = build_nx_graph(llm_ents, llm_rels, "LLM extraction")
-        draw_graph(llm_graph, outdir / "graph_llm.png", "LLM Extraction")
 
         llm_ent_score = score_entities(GT_ENTITIES, llm_ents, "LLM entities")
         llm_rel_score = score_relations(GT_RELATIONS, llm_rels, "LLM relations")

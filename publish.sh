@@ -9,10 +9,7 @@ cd "$(dirname "$0")"
 MSG="${1:-update results}"
 
 echo "==> Copying figures from code/output/benchmark/ …"
-cp -v code/output/benchmark/graph_ground_truth.png figures/
-cp -v code/output/benchmark/graph_gliner2.png      figures/
-cp -v code/output/benchmark/graph_llm.png          figures/
-cp -v code/output/benchmark/comparison.png         figures/
+cp -v code/output/benchmark/comparison.png figures/
 
 echo ""
 echo "==> Staging changes …"
