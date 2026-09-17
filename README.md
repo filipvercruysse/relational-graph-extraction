@@ -47,9 +47,11 @@ We wrote a short paragraph about a **deforestation feedback loop** with 16 entit
 
 We compare each extractor's output against the hand-labeled ground truth using three metrics:
 
-- **Precision** — *of everything the model claimed, how much was correct?* A model that extracts 10 entities and 9 are real has precision = 0.90. High precision means few false alarms.
-- **Recall** — *of everything that should have been found, how much did the model actually find?* If there are 16 ground-truth entities and the model found 14 of them, recall = 14/16 = 0.88. High recall means few things were missed.
-- **F1** — *the harmonic mean of precision and recall.* It penalises models that are good at one but bad at the other. An F1 of 1.0 means the model found exactly the right things, no more, no less.
+- **Precision** — *of everything the model returned, how much was actually correct?* If a model extracts 10 entities but only 9 match the ground truth, precision = 9/10 = 0.90. Precision catches **over-extraction**: a model that invents things it shouldn't will have low precision.
+- **Recall** — *of everything that exists in the ground truth, how much did the model find?* If there are 16 ground-truth entities and the model found 14, recall = 14/16 = 0.88. Recall catches **missed items**: a model that plays it safe and only returns obvious things will have low recall.
+- **F1** — a single number that combines both, computed as 2 × (precision × recall) / (precision + recall). It is *not* a simple average — if either precision or recall is near zero, F1 drops sharply. A model with precision = 1.0 but recall = 0.01 (found one thing perfectly, missed everything else) gets an F1 of just 0.02. You need both to be high for F1 to be high.
+
+**Why we need both precision and recall:** A model that returns *everything* as an entity would get perfect recall (it misses nothing) but terrible precision (most of its answers are wrong). A model that returns *only one entity* it's very confident about would get perfect precision (it's never wrong) but terrible recall (it misses almost everything). Neither extreme is useful. Precision and recall measure these two different failure modes, and F1 tells you whether a model avoids both.
 
 We compute these separately for **entities** (did you find the right nodes?) and **relations** (did you draw the right edges between them?).
 
